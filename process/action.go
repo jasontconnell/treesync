@@ -33,7 +33,7 @@ func getAction(name string) Action {
 	return a
 }
 
-func getFiles(treesyncroot, wd, file string, roots []string, excludeMap map[string]bool) (string, []string) {
+func getFiles(treesyncroot, wd, file string, roots, excludeMap map[string]bool) (string, []string) {
 	fullPath := filepath.Join(wd, file)
 
 	curroot := strings.TrimPrefix(string(fullPath[len(treesyncroot):]), string(filepath.Separator))
@@ -44,7 +44,7 @@ func getFiles(treesyncroot, wd, file string, roots []string, excludeMap map[stri
 
 	paths := []string{}
 
-	for _, r := range roots {
+	for r := range roots {
 		if r == curroot {
 			continue
 		}
@@ -57,7 +57,7 @@ func getFiles(treesyncroot, wd, file string, roots []string, excludeMap map[stri
 	return fullPath, paths
 }
 
-func Process(action string, curdir, treesyncroot, file string, excludeMap map[string]bool, roots []string) error {
+func Process(action string, curdir, treesyncroot, file string, excludeMap map[string]bool, roots map[string]bool) error {
 	a := getAction(action)
 	cur, files := getFiles(treesyncroot, curdir, file, roots, excludeMap)
 

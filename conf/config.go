@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/jasontconnell/conf"
 )
@@ -16,11 +17,12 @@ type Config struct {
 	AlwaysExclude []string `json:"alwaysExclude"`
 }
 
-func GetExcludeMap(exclude string, excludes []string) map[string]bool {
+func GetStringMap(str ...[]string) map[string]bool {
 	m := make(map[string]bool)
-	m[exclude] = true
-	for _, e := range excludes {
-		m[e] = true
+	for _, ary := range str {
+		for _, s := range ary {
+			m[strings.Trim(s, " ")] = true
+		}
 	}
 	return m
 }

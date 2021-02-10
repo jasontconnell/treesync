@@ -15,7 +15,8 @@ treesync.json needs to be in the root of the directory structure and just have a
 
 Parameters:
  - a :  The action. Supported actions are copy, delete, sync
- - e : Exclude folder during this operation
+ - exc : Exclude folders during this operation (csv)
+ - inc : Include only these folders during this operation (csv)
  - file or folder : the file or folder to sync
 
 For delete operation, the file doesn't have to exist.
