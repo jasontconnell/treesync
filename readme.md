@@ -27,3 +27,19 @@ For delete operation, the file doesn't have to exist.
 `delete` will only work on files currently
 
 The command can be run from anywhere (best is to go install it) and will determine the root up the file tree, much like git works with .git folder (and numerous other examples)
+
+Example:
+
+In a folder structure like this:
+<pre>
+    /
+        /test1
+            /file.txt
+        /test2
+            /folder
+                /infolder.txt
+            /file2.txt
+        treesync.json
+</pre>
+
+If your current working directory was `/test2/folder/` and you ran `treesync -a copy infolder.txt`, it will create the folder structure of `/test1/folder/` and copy `infolder.txt` into test1.  It will do this for all folders specified in `treesync.json`.
