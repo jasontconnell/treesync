@@ -1,0 +1,4 @@
+test/
+run.ps1
+config.json
+*.exe
