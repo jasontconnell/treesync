@@ -36,7 +36,7 @@ func getAction(name string) Action {
 func getFiles(treesyncroot, wd, file string, roots []string, excludeMap map[string]bool) (string, []string) {
 	fullPath := filepath.Join(wd, file)
 
-	curroot := strings.TrimPrefix(string(wd[len(treesyncroot):]), string(filepath.Separator))
+	curroot := strings.TrimPrefix(string(fullPath[len(treesyncroot):]), string(filepath.Separator))
 	parts := strings.Split(curroot, string(filepath.Separator))
 	curroot = parts[0]
 	currootabs := filepath.Join(treesyncroot, curroot)
