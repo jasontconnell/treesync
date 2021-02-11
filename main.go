@@ -58,7 +58,7 @@ func main() {
 
 	cfg, err := conf.FindRoot(wd, *cfgfile)
 
-	setLog(wd, cfg.Log)
+	setLog(cfg.Root, cfg.Log)
 	if err == conf.NoTreesyncErr {
 		log.Println("no tree sync root config file found", wd, *cfgfile, file)
 	}
