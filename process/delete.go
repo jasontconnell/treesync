@@ -8,7 +8,11 @@ import (
 type deleteaction struct{}
 
 func deletefile(path string) error {
-	return os.Remove(path)
+	stat, _ := os.Stat(path) // make sure file exists before removing it.
+	if stat != nil && !stat.IsDir() {
+		return os.Remove(path)
+	}
+	return nil
 }
 
 func (a deleteaction) Process(path string, info os.FileInfo, dests []string) error {

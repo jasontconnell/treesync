@@ -13,8 +13,10 @@ var NoTreesyncErr error = errors.New("No Treesync config found")
 
 type Config struct {
 	Root          string
-	RootFolders   []string `json:"rootFolders"`
-	AlwaysExclude []string `json:"alwaysExclude"`
+	RootFolders   []string            `json:"rootFolders"`
+	AlwaysExclude []string            `json:"alwaysExclude"`
+	Log           string              `json:"log"`
+	FolderGroups  map[string][]string `json:"folderGroups"`
 }
 
 func GetStringMap(str ...[]string) map[string]bool {

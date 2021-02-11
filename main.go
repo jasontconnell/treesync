@@ -4,12 +4,26 @@ import (
 	"flag"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/jasontconnell/treesync/conf"
 	"github.com/jasontconnell/treesync/process"
 )
+
+func setLog(wd, name string) {
+	if name != "stdout" {
+		// exe, _ := os.Executable()
+		logfile := filepath.Join(wd, name)
+		f, err := os.OpenFile(logfile, os.O_CREATE|os.O_APPEND, os.ModePerm)
+		if err != nil {
+			log.Println("couldn't open log file")
+			return
+		}
+		log.SetOutput(f)
+	}
+}
 
 func main() {
 	start := time.Now()
@@ -36,23 +50,56 @@ func main() {
 		log.Fatalf("invalid action %s", *action)
 	}
 
+	usefile := filepath.IsAbs(file)
 	wd, err := os.Getwd()
-	cfg, err := conf.FindRoot(wd, *cfgfile)
-	if err == conf.NoTreesyncErr {
-		log.Println("no tree sync root config file found", *cfgfile)
+	if usefile {
+		wd = filepath.Dir(file)
 	}
 
-	emap := conf.GetStringMap(strings.Split(*exclude, ","), cfg.AlwaysExclude)
+	cfg, err := conf.FindRoot(wd, *cfgfile)
+
+	setLog(wd, cfg.Log)
+	if err == conf.NoTreesyncErr {
+		log.Println("no tree sync root config file found", wd, *cfgfile, file)
+	}
+
+	for l, g := range cfg.FolderGroups {
+		log.Println(l, g)
+	}
+
+	var excfinal []string
+	exlist := strings.Split(*exclude, ",")
+	for _, ex := range exlist {
+		if list, ok := cfg.FolderGroups[ex]; ok {
+			excfinal = append(excfinal, list...)
+		} else {
+			excfinal = append(excfinal, ex)
+		}
+	}
+	emap := conf.GetStringMap(excfinal, cfg.AlwaysExclude)
+
 	var incmap map[string]bool
 	if *include != "" {
-		incmap = conf.GetStringMap(strings.Split(*include, ","))
+		log.Println("inc not blank", *include)
+		incfinal := []string{}
+		inclist := strings.Split(*include, ",")
+		for _, inc := range inclist {
+			log.Println("chcking folder group", inc)
+			if list, ok := cfg.FolderGroups[inc]; ok {
+				log.Println("using folder group", inc)
+				incfinal = append(incfinal, list...)
+			} else {
+				incfinal = append(incfinal, inc)
+			}
+		}
+		incmap = conf.GetStringMap(incfinal)
 	} else {
 		incmap = conf.GetStringMap(cfg.RootFolders)
 	}
 
 	err = process.Process(*action, wd, cfg.Root, file, emap, incmap)
 	if err != nil {
-		log.Fatal("error processing", err)
+		log.Fatal(os.Args, "\nerror processing - ", cfg.Root, "\n", file, "\n", err)
 	}
 	log.Println("Success. Time:", time.Since(start))
 }

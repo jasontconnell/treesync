@@ -34,7 +34,10 @@ func getAction(name string) Action {
 }
 
 func getFiles(treesyncroot, wd, file string, roots, excludeMap map[string]bool) (string, []string) {
-	fullPath := filepath.Join(wd, file)
+	fullPath := filepath.Clean(filepath.Join(wd, file))
+	if filepath.IsAbs(file) {
+		fullPath = file
+	}
 
 	curroot := strings.TrimPrefix(string(fullPath[len(treesyncroot):]), string(filepath.Separator))
 	parts := strings.Split(curroot, string(filepath.Separator))
@@ -63,7 +66,7 @@ func Process(action string, curdir, treesyncroot, file string, excludeMap map[st
 
 	stat, err := os.Stat(cur)
 	if err != nil && a.RequireFileExist() {
-		return fmt.Errorf("file or folder doesn't exist and %s requires it: %s %w", action, file, err)
+		return fmt.Errorf("file or folder doesn't exist and %s requires it: %s %s %w", action, curdir, file, err)
 	}
 
 	isdir := stat != nil && stat.IsDir()
