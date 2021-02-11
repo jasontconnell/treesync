@@ -15,6 +15,14 @@ func deletefile(path string) error {
 	return nil
 }
 
+func deletefolder(path string) error {
+	stat, _ := os.Stat(path) // make sure file exists before removing it.
+	if stat != nil && stat.IsDir() {
+		return os.RemoveAll(path)
+	}
+	return nil
+}
+
 func (a deleteaction) Process(path string, info os.FileInfo, dests []string) error {
 	for _, d := range dests {
 		err := deletefile(d)
@@ -28,4 +36,15 @@ func (a deleteaction) Process(path string, info os.FileInfo, dests []string) err
 
 func (a deleteaction) RequireFileExist() bool {
 	return false
+}
+
+func (a deleteaction) ProcessDir(path string, info os.FileInfo, dests []string) error {
+	for _, d := range dests {
+		err := deletefolder(d)
+		if err != nil {
+			return fmt.Errorf("deleting folder %s. %w", d, err)
+		}
+	}
+
+	return nil
 }

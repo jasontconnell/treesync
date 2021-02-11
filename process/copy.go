@@ -3,7 +3,6 @@ package process
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -58,7 +57,6 @@ func (a copyaction) ProcessDir(path string, info os.FileInfo, dests []string) er
 		return nil
 	})
 
-	log.Println("found", len(copyRelPaths))
 	for _, d := range dests {
 		for _, c := range copyRelPaths {
 			sfull := filepath.Join(path, c)

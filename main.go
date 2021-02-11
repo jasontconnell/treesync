@@ -18,7 +18,7 @@ func setLog(wd, name string) {
 		logfile := filepath.Join(wd, name)
 		f, err := os.OpenFile(logfile, os.O_CREATE|os.O_APPEND, os.ModePerm)
 		if err != nil {
-			log.Println("couldn't open log file")
+			log.Println("couldn't open log file, using stdout")
 			return
 		}
 		log.SetOutput(f)
@@ -58,13 +58,12 @@ func main() {
 
 	cfg, err := conf.FindRoot(wd, *cfgfile)
 
-	setLog(cfg.Root, cfg.Log)
-	if err == conf.NoTreesyncErr {
-		log.Println("no tree sync root config file found", wd, *cfgfile, file)
+	if err != nil {
+		setLog(cfg.Root, cfg.Log)
 	}
 
-	for l, g := range cfg.FolderGroups {
-		log.Println(l, g)
+	if err == conf.NoTreesyncErr {
+		log.Fatal("no tree sync root config file found", wd, *cfgfile, file)
 	}
 
 	var excfinal []string
@@ -80,13 +79,10 @@ func main() {
 
 	var incmap map[string]bool
 	if *include != "" {
-		log.Println("inc not blank", *include)
 		incfinal := []string{}
 		inclist := strings.Split(*include, ",")
 		for _, inc := range inclist {
-			log.Println("chcking folder group", inc)
 			if list, ok := cfg.FolderGroups[inc]; ok {
-				log.Println("using folder group", inc)
 				incfinal = append(incfinal, list...)
 			} else {
 				incfinal = append(incfinal, inc)
